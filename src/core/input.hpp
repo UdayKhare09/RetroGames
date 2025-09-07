@@ -63,7 +63,7 @@ namespace core {
 
             if (controller_) {
                 if (const Sint16 controller_axis = SDL_GameControllerGetAxis(controller_, SDL_CONTROLLER_AXIS_LEFTX); std::abs(controller_axis) > 8000) {
-                    axis = controller_axis / 32767.0f;
+                    axis = static_cast<float>(controller_axis) / 32767.0f;
                 }
             }
 

@@ -167,7 +167,7 @@ namespace core {
                 const float aligned_x = std::round(x);
                 const float aligned_y = std::round(y);
 
-                const float render_y = aligned_y - ascent;
+                const float render_y = aligned_y - static_cast<float>(ascent);
 
                 glBegin(GL_QUADS);
                 glTexCoord2f(0.0f, 1.0f);
@@ -213,7 +213,7 @@ namespace core {
             int width;
             TTF_SizeText(font, text.c_str(), &width, nullptr);
 
-            return is_sized_font ? static_cast<float>(width) : width * scale;
+            return is_sized_font ? static_cast<float>(width) : static_cast<float>(width) * scale;
         }
 
         [[nodiscard]] float getTextHeight(const std::string &text, const float scale = 1.0f,
@@ -242,7 +242,7 @@ namespace core {
             int height;
             TTF_SizeText(font, text.c_str(), nullptr, &height);
 
-            return is_sized_font ? static_cast<float>(height) : height * scale;
+            return is_sized_font ? static_cast<float>(height) : static_cast<float>(height) * scale;
         }
 
         [[nodiscard]] bool isInitialized() const {
@@ -254,30 +254,26 @@ namespace core {
         FontManager &font_manager_;
 
     public:
-        explicit TextRenderer(FontManager &fm) : font_manager_(fm) {
-        }
+        explicit TextRenderer(FontManager &fm) : font_manager_(fm) {}
 
-        void drawText(const std::string &text, const float x, const float y,
+        void drawText(const std::string &text,float render_x, const float y,
                       const float scale = 1.0f, const Color &color = Color{},
                       const TextAlign align = TextAlign::Left) const {
             if (!font_manager_.isInitialized()) return;
 
             const float text_width = font_manager_.getTextWidth(text, scale);
-            float render_x = x;
 
             switch (align) {
                 case TextAlign::Center:
-                    render_x = x - text_width / 2.0f;
+                    render_x = render_x - text_width / 2.0f;
                     break;
                 case TextAlign::Right:
-                    render_x = x - text_width;
+                    render_x = render_x - text_width;
                     break;
                 case TextAlign::Left:
                 default:
-                    render_x = x;
                     break;
             }
-
             font_manager_.renderText(text, render_x, y, scale, color);
         }
 

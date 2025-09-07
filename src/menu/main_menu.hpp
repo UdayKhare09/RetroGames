@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include <memory>
 
 namespace menu {
     class MenuItem {
@@ -48,30 +47,30 @@ namespace menu {
             prev_down_ = down_pressed;
         }
 
-        void render(core::Renderer &renderer) const {
-            renderer.clear(0.05f, 0.05f, 0.1f);
+        void render(const core::Renderer &renderer) const {
+            core::Renderer::clear(0.05f, 0.05f, 0.1f);
 
             renderer.drawTextCentered("RETRO GAMES COLLECTION",
-                                      renderer.getWidth() / 2.0f,
-                                      renderer.getHeight() * 0.85f,
+                                      static_cast<float>(renderer.getWidth()) / 2.0f,
+                                      static_cast<float>(renderer.getHeight()) * 0.85f,
                                       2.0f,
                                       core::Color{1.0f, 1.0f, 0.2f});
 
-            const float start_y = renderer.getHeight() * 0.6f;
+            const float start_y = static_cast<float>(renderer.getHeight()) * 0.6f;
 
             for (size_t i = 0; i < items_.size(); ++i) {
                 constexpr float item_height = 60.0f;
-                const float y = start_y - i * item_height;
+                const float y = start_y - static_cast<float>(i) * item_height;
 
                 if (i == selected_index_) {
                     renderer.drawTextCentered(items_[i].text,
-                                              renderer.getWidth() / 2.0f,
+                                              static_cast<float>(renderer.getWidth()) / 2.0f,
                                               y + 5.0f,
                                               1.5f,
                                               core::Color{1.0f, 1.0f, 1.0f});
                 } else {
                     renderer.drawTextCentered(items_[i].text,
-                                              renderer.getWidth() / 2.0f,
+                                              static_cast<float>(renderer.getWidth()) / 2.0f,
                                               y + 5.0f,
                                               1.2f,
                                               core::Color{0.8f, 0.8f, 0.8f});
@@ -79,17 +78,17 @@ namespace menu {
             }
 
             renderer.drawTextCentered("Use Arrow Keys or D-Pad to navigate",
-                                      renderer.getWidth() / 2.0f,
+                                      static_cast<float>(renderer.getWidth()) / 2.0f,
                                       120.0f,
                                       1.0f,
                                       core::Color{0.6f, 0.6f, 0.6f});
             renderer.drawTextCentered("Press Space, Enter, or A Button to select",
-                                      renderer.getWidth() / 2.0f,
+                                      static_cast<float>(renderer.getWidth()) / 2.0f,
                                       90.0f,
                                       1.0f,
                                       core::Color{0.6f, 0.6f, 0.6f});
             renderer.drawTextCentered("Press ESC to quit",
-                                      renderer.getWidth() / 2.0f,
+                                      static_cast<float>(renderer.getWidth()) / 2.0f,
                                       60.0f,
                                       1.0f,
                                       core::Color{0.6f, 0.6f, 0.6f});

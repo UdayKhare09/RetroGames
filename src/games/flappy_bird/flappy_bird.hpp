@@ -162,24 +162,24 @@ namespace games::flappy_bird {
         }
 
         void render(core::Renderer &renderer) override {
-            renderer.clear(0.5f, 0.8f, 1.0f);
+            core::Renderer::clear(0.5f, 0.8f, 1.0f);
 
             if (state_ == GameState::Playing || state_ == GameState::GameOver) {
-                renderer.setColor(0.0f, 0.8f, 0.0f);
+                core::Renderer::setColor(0.0f, 0.8f, 0.0f);
                 for (const auto &pipe: pipes_) {
                     if (pipe->active) {
                         const float top_height = (600.0f - pipe->gap_center_y - Pipe::GAP_SIZE / 2);
                         const float top_center_y = pipe->gap_center_y + Pipe::GAP_SIZE / 2 + top_height / 2;
-                        renderer.drawRect(pipe->pos.x, top_center_y, pipe->size.x, top_height);
+                        core::Renderer::drawRect(pipe->pos.x, top_center_y, pipe->size.x, top_height);
 
                         const float bottom_height = pipe->gap_center_y - Pipe::GAP_SIZE / 2;
                         const float bottom_center_y = bottom_height / 2;
-                        renderer.drawRect(pipe->pos.x, bottom_center_y, pipe->size.x, bottom_height);
+                        core::Renderer::drawRect(pipe->pos.x, bottom_center_y, pipe->size.x, bottom_height);
                     }
                 }
 
-                renderer.setColor(1.0f, 1.0f, 0.0f);
-                renderer.drawCircle(bird_->pos.x, bird_->pos.y, bird_->size.x / 2, 16);
+                core::Renderer::setColor(1.0f, 1.0f, 0.0f);
+                core::Renderer::drawCircle(bird_->pos.x, bird_->pos.y, bird_->size.x / 2, 16);
 
                 renderer.drawText("SCORE: " + std::to_string(score_),
                                   20.0f, 580.0f, 1.5f,
@@ -187,8 +187,8 @@ namespace games::flappy_bird {
             }
 
             if (state_ == GameState::GameOver) {
-                renderer.setColor(0.0f, 0.0f, 0.0f, 0.8f);
-                renderer.drawRect(400.0f, 300.0f, 500.0f, 200.0f);
+                core::Renderer::setColor(0.0f, 0.0f, 0.0f, 0.8f);
+                core::Renderer::drawRect(400.0f, 300.0f, 500.0f, 200.0f);
 
                 renderer.drawTextCentered("GAME OVER",
                                           400.0f, 360.0f, 2.5f,

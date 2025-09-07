@@ -1,6 +1,4 @@
 #include <SDL2/SDL.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -162,7 +160,7 @@ public:
 
         while (running_) {
             const Uint32 current_time = SDL_GetTicks();
-            float delta_time = (current_time - last_time) / 1000.0f;
+            float delta_time = static_cast<float>(current_time - last_time) / 1000.0f;
             last_time = current_time;
 
             delta_time = std::min(delta_time, 1.0f / 30.0f);
@@ -171,8 +169,8 @@ public:
             update(delta_time);
             render();
 
-            if (const Uint32 frame_time = SDL_GetTicks() - current_time; frame_time < TARGET_FRAME_TIME) {
-                SDL_Delay(static_cast<Uint32>(TARGET_FRAME_TIME - frame_time));
+            if (const Uint32 frame_time = SDL_GetTicks() - current_time; static_cast<float>(frame_time) < TARGET_FRAME_TIME) {
+                SDL_Delay(static_cast<Uint32>(TARGET_FRAME_TIME - static_cast<float>(frame_time)));
             }
         }
     }

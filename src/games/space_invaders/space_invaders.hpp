@@ -95,7 +95,7 @@ namespace games::space_invaders {
             for (int row = 0; row < 5; ++row) {
                 for (int col = 0; col < 10; ++col) {
                     auto invader = std::make_unique<Invader>(
-                        core::Vector2{50.0f + col * 60.0f, 600.0f - 100.0f - row * 30.0f}
+                        core::Vector2{50.0f + static_cast<float>(col) * 60.0f, 600.0f - 100.0f - static_cast<float>(row) * 30.0f}
                     );
                     invaders_.push_back(std::move(invader));
                 }
@@ -126,7 +126,7 @@ namespace games::space_invaders {
                     invader_direction_ *= -1;
                     for (const auto &invader: invaders_) {
                         if (invader->active) {
-                            invader->velocity.x = 20.0f * invader_direction_;
+                            invader->velocity.x = 20.0f * static_cast<float>(invader_direction_);
                             invader->pos.y -= 10.0f;
 
                             if (invader->pos.y <= 70.0f) {
@@ -203,23 +203,23 @@ namespace games::space_invaders {
         }
 
         void render(core::Renderer &renderer) override {
-            renderer.clear(0.0f, 0.0f, 0.1f);
+            core::Renderer::clear(0.0f, 0.0f, 0.1f);
 
             if (state_ == GameState::Playing) {
-                renderer.setColor(0.0f, 1.0f, 0.0f);
-                renderer.drawRect(player_->pos.x, player_->pos.y, player_->size.x, player_->size.y);
+                core::Renderer::setColor(0.0f, 1.0f, 0.0f);
+                core::Renderer::drawRect(player_->pos.x, player_->pos.y, player_->size.x, player_->size.y);
 
-                renderer.setColor(1.0f, 0.0f, 0.0f);
+                core::Renderer::setColor(1.0f, 0.0f, 0.0f);
                 for (const auto &invader: invaders_) {
                     if (invader->active) {
-                        renderer.drawRect(invader->pos.x, invader->pos.y, invader->size.x, invader->size.y);
+                        core::Renderer::drawRect(invader->pos.x, invader->pos.y, invader->size.x, invader->size.y);
                     }
                 }
 
-                renderer.setColor(1.0f, 1.0f, 1.0f);
+                core::Renderer::setColor(1.0f, 1.0f, 1.0f);
                 for (const auto &bullet: bullets_) {
                     if (bullet->active) {
-                        renderer.drawRect(bullet->pos.x, bullet->pos.y, bullet->size.x, bullet->size.y);
+                        core::Renderer::drawRect(bullet->pos.x, bullet->pos.y, bullet->size.x, bullet->size.y);
                     }
                 }
 
@@ -227,8 +227,8 @@ namespace games::space_invaders {
                                   20.0f, 580.0f, 1.2f,
                                   core::Color{1.0f, 1.0f, 0.0f});
             } else if (state_ == GameState::GameOver) {
-                renderer.setColor(0.0f, 0.0f, 0.0f, 0.7f);
-                renderer.drawRect(400.0f, 300.0f, 600.0f, 200.0f);
+                core::Renderer::setColor(0.0f, 0.0f, 0.0f, 0.7f);
+                core::Renderer::drawRect(400.0f, 300.0f, 600.0f, 200.0f);
 
                 renderer.drawTextCentered("GAME OVER",
                                           400.0f, 350.0f, 2.5f,
