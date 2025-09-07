@@ -79,7 +79,7 @@ namespace core {
             glVertex2f(x, y);
 
             for (int i = 0; i <= segments; ++i) {
-                const auto angle = static_cast<float>(2.0f * M_PI * i / segments);
+                const auto angle = static_cast<float>(2.0f * std::acos(-1.0) * i / segments);
                 glVertex2f(x + radius * std::cos(angle), y + radius * std::sin(angle));
             }
             glEnd();

@@ -1,5 +1,7 @@
 # Build directories
 build/
+build-mingw/
+dist/
 cmake-build-*/
 
 # IDE files

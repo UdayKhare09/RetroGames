@@ -5,9 +5,14 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_CXX_COMPILER "clang++")
+if(NOT DEFINED CMAKE_CXX_COMPILER)
+    # Prefer clang on native builds, but allow cross-toolchains to override
+    set(CMAKE_CXX_COMPILER "clang++")
+endif()
 
-set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
+endif()
 
 # Compiler flags for modern C++ and optimization
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
@@ -32,11 +37,21 @@ target_include_directories(retro_games_collection PRIVATE
     ${SDL2_TTF_INCLUDE_DIRS}
 )
 
-target_link_libraries(retro_games_collection 
-    SDL2::SDL2 
-    OpenGL::GL 
-    OpenGL::GLU
-    ${SDL2_TTF_LIBRARIES}
-)
+if(WIN32)
+    # On Windows/MinGW link against the system OpenGL libraries
+    target_link_libraries(retro_games_collection 
+        SDL2::SDL2
+        opengl32
+        glu32
+        ${SDL2_TTF_LIBRARIES}
+    )
+else()
+    target_link_libraries(retro_games_collection 
+        SDL2::SDL2 
+        OpenGL::GL 
+        OpenGL::GLU
+        ${SDL2_TTF_LIBRARIES}
+    )
+endif()
 
 target_compile_definitions(retro_games_collection PRIVATE HAS_SDL_TTF)
