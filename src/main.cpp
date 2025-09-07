@@ -29,28 +29,27 @@ private:
     std::unique_ptr<core::Renderer> renderer_;
     std::unique_ptr<core::InputManager> input_;
     std::unique_ptr<menu::MainMenu> main_menu_;
-    std::vector<std::unique_ptr<games::Game>> games_;
-    
+    std::vector<std::unique_ptr<games::Game> > games_;
+
     AppState app_state_{AppState::Menu};
     size_t current_game_index_{0};
     bool running_{true};
     bool escape_was_pressed_{false};
-    
-    void initializeSDL() {
+
+    static void initializeSDL() {
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0) {
             throw std::runtime_error("Failed to initialize SDL: " + std::string(SDL_GetError()));
         }
     }
-    
+
     void setupGames() {
         games_.push_back(std::make_unique<games::space_invaders::SpaceInvadersGame>());
         games_.push_back(std::make_unique<games::flappy_bird::FlappyBirdGame>());
     }
-    
+
     void setupMenu() {
         main_menu_ = std::make_unique<menu::MainMenu>();
-        
-        // Add game options
+
         for (size_t i = 0; i < games_.size(); ++i) {
             main_menu_->addItem(games_[i]->getName(), [this, i]() {
                 current_game_index_ = i;
@@ -58,13 +57,12 @@ private:
                 app_state_ = AppState::InGame;
             });
         }
-        
-        // Add quit option
+
         main_menu_->addItem("Quit", [this]() {
             app_state_ = AppState::Quitting;
         });
     }
-    
+
     void handleEvents() {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -72,12 +70,11 @@ private:
                 app_state_ = AppState::Quitting;
             }
         }
-        
+
         input_->update();
-        
-        // Handle ESC key/Y button to return to menu
+
         if (input_->isEscapePressed()) {
-            if (!escape_was_pressed_) {  // Only trigger on initial press
+            if (!escape_was_pressed_) {
                 if (app_state_ == AppState::InGame) {
                     app_state_ = AppState::Menu;
                 } else if (app_state_ == AppState::Menu) {
@@ -89,110 +86,104 @@ private:
             escape_was_pressed_ = false;
         }
     }
-    
-    void update(float dt) {
+
+    void update(const float dt) {
         switch (app_state_) {
             case AppState::Menu:
                 main_menu_->update(*input_);
                 break;
-                
+
             case AppState::InGame:
                 if (current_game_index_ < games_.size()) {
                     games_[current_game_index_]->update(dt, *input_);
-                    
-                    // Check if game ended and player wants to return to menu
+
                     if (games_[current_game_index_]->getState() == games::GameState::GameOver) {
-                        // Could add a delay or require specific input to return to menu
                     }
                 }
                 break;
-                
+
             case AppState::Quitting:
                 running_ = false;
                 break;
         }
     }
-    
-    void render() {
+
+    void render() const {
         switch (app_state_) {
             case AppState::Menu:
                 main_menu_->render(*renderer_);
                 break;
-                
+
             case AppState::InGame:
                 if (current_game_index_ < games_.size()) {
                     games_[current_game_index_]->render(*renderer_);
                 }
                 break;
-                
+
             case AppState::Quitting:
-                // Optional: render a quitting screen
                 break;
         }
-        
+
         renderer_->present();
     }
-    
+
 public:
     GameManager() {
         initializeSDL();
-        
-        renderer_ = std::make_unique<core::Renderer>("Retro Games Collection", 
-                                                    WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        renderer_ = std::make_unique<core::Renderer>("Retro Games Collection",
+                                                     WINDOW_WIDTH, WINDOW_HEIGHT);
         input_ = std::make_unique<core::InputManager>();
-        
+
         setupGames();
         setupMenu();
-        
+
         std::cout << "Retro Games Collection initialized!\n";
         std::cout << "Controls:\n";
         std::cout << "  Menu: Arrow keys or D-pad to navigate, Space/Enter/A button to select\n";
         std::cout << "  Games: Arrow keys or left stick to move, Space/A button to shoot/jump\n";
         std::cout << "  ESC/Y Button: Return to menu or quit\n";
-        
+
         if (input_->hasController()) {
             std::cout << "Controller detected and ready!\n";
         }
     }
-    
+
     ~GameManager() {
         SDL_Quit();
     }
-    
-    // Delete copy constructor and assignment operator
-    GameManager(const GameManager&) = delete;
-    GameManager& operator=(const GameManager&) = delete;
-    
+
+    GameManager(const GameManager &) = delete;
+
+    GameManager &operator=(const GameManager &) = delete;
+
     void run() {
         Uint32 last_time = SDL_GetTicks();
-        
+
         while (running_) {
-            Uint32 current_time = SDL_GetTicks();
+            const Uint32 current_time = SDL_GetTicks();
             float delta_time = (current_time - last_time) / 1000.0f;
             last_time = current_time;
-            
-            // Cap delta time to prevent large jumps
+
             delta_time = std::min(delta_time, 1.0f / 30.0f);
-            
+
             handleEvents();
             update(delta_time);
             render();
-            
-            // Frame rate limiting
-            Uint32 frame_time = SDL_GetTicks() - current_time;
-            if (frame_time < TARGET_FRAME_TIME) {
+
+            if (const Uint32 frame_time = SDL_GetTicks() - current_time; frame_time < TARGET_FRAME_TIME) {
                 SDL_Delay(static_cast<Uint32>(TARGET_FRAME_TIME - frame_time));
             }
         }
     }
 };
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
+int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
     try {
         GameManager manager;
         manager.run();
         return 0;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
